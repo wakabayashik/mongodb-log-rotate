@@ -17,8 +17,8 @@ jobs:
       fail-fast: false
       matrix:
         job:
-          # - { os: ubuntu-latest  , target: x86_64-unknown-linux-gnu       , use-cross: false , extension: ""   }
-          - { os: ubuntu-latest  , target: x86_64-unknown-linux-musl      , use-cross: true  , extension: ""   }
+          - { os: ubuntu-latest  , target: x86_64-unknown-linux-gnu       , use-cross: false , extension: ""   }
+          # - { os: ubuntu-latest  , target: x86_64-unknown-linux-musl      , use-cross: true  , extension: ""   }
           # - { os: ubuntu-latest  , target: armv7-unknown-linux-gnueabihf  , use-cross: true  , extension: ""   }
           # - { os: ubuntu-latest  , target: armv7-unknown-linux-musleabihf , use-cross: true  , extension: ""   }
           # - { os: ubuntu-latest  , target: aarch64-unknown-linux-gnu      , use-cross: true  , extension: ""   }
@@ -45,11 +45,14 @@ jobs:
         shell: bash
         run: cargo build --release --target ${{ matrix.job.target }}
 
-      # ビルド済みバイナリを zip にアーカイブ
-      - name: Compress into zip
-        shell: bash
-        run: |
-          cd target/${{ matrix.job.target }}/release/ && zip ${{ env.PROJECT_NAME }}_${{ github.ref_name }}-${{ matrix.job.target }}.zip ${{ env.PROJECT_NAME }}
+      # ビルド済みバイナリを 7z にアーカイブ
+      - name: Archive Release
+        uses: thedoctor0/zip-release@main
+        with:
+          type: '7z'
+          filename: ${{ env.PROJECT_NAME }}_${{ github.ref_name }}-${{ matrix.job.target }}.7z
+          directory: target/${{ matrix.job.target }}/release/
+          path: ${{ env.PROJECT_NAME }}${{ matrix.job.extension }}
 
       # ビルド済みバイナリをReleasesに配置
       - name: Release
@@ -58,4 +61,4 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           files: |
-            target/${{ matrix.job.target }}/release/${{ env.PROJECT_NAME }}_${{ github.ref_name }}-${{ matrix.job.target }}.zip
+            target/${{ matrix.job.target }}/release/${{ env.PROJECT_NAME }}_${{ github.ref_name }}-${{ matrix.job.target }}.7z
