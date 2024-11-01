@@ -1,0 +1,8 @@
+[package]
+name = "mongodb-log-rotate"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+mongodb = "3.1.0"
+tokio = { version = "1.41.0", features = ["full"] }
