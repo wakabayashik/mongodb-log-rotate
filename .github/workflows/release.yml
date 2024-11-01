@@ -45,20 +45,20 @@ jobs:
         shell: bash
         run: cargo build --release --target ${{ matrix.job.target }}
 
-      # ビルド済みバイナリを 7z にアーカイブ
+      # ビルド済みバイナリを zip にアーカイブ
       - name: Archive Release
         uses: thedoctor0/zip-release@main
         with:
-          type: '7z'
-          filename: ${{ env.PROJECT_NAME }}_${{ github.ref_name }}-${{ matrix.job.target }}.7z
+          type: 'zip'
+          filename: ${{ env.PROJECT_NAME }}_${{ github.ref_name }}-${{ matrix.job.target }}.zip
           directory: target/${{ matrix.job.target }}/release/
           path: ${{ env.PROJECT_NAME }}${{ matrix.job.extension }}
 
       # ビルド済みバイナリをReleasesに配置
       - name: Release
-        uses: softprops/action-gh-release@v1
+        uses: softprops/action-gh-release@v2
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           files: |
-            target/${{ matrix.job.target }}/release/${{ env.PROJECT_NAME }}_${{ github.ref_name }}-${{ matrix.job.target }}.7z
+            target/${{ matrix.job.target }}/release/${{ env.PROJECT_NAME }}_${{ github.ref_name }}-${{ matrix.job.target }}.zip
